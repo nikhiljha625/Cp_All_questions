@@ -1,0 +1,1 @@
+{"name":"Local: practice_oa","url":"/home/oem/c++/practice_oa.cpp","tests":[{"id":1688970422887,"input":"2\n4 5\n.***.\n*****\n*****\n*.*.*\n5 7\n..*.*..\n.*****.\n*******\n.*****.\n..*.*..","output":"5\n3\n23\n34"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"/home/oem/c++/practice_oa.cpp","group":"local","local":true}
