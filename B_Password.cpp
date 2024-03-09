@@ -141,86 +141,91 @@ ll mod = 1e9+7;
 
 
 
-int maxmarray(int i,int prev,int& n,int& m,vector<vector<int>>& dp,vector<int>& v){
-    // cout<<i<<" "<<prev<<"\n";
-    if(i>=n) return 1;
-    if(v[i]>0){
-        if(prev==0) return dp[i][prev]= maxmarray(i+1,v[i],n,m,dp,v)%mod;
-        else{
-            int diff = abs(prev-v[i]);
-            if(diff>1) return 0;
-            else return dp[i][prev]=maxmarray(i+1,v[i],n,m,dp,v)%mod;
-        }
-    }
-    else{
-        int ways=0;
-        if(prev==0){
-            for(int j=1;j<=m;j++){
-                ways+=(maxmarray(i+1,j,n,m,dp,v))%mod;
-            }
-        }
-        else if(prev==1){
-            ways+=(maxmarray(i+1,prev+1,n,m,dp,v))%mod;
-            ways+=(maxmarray(i+1,prev,n,m,dp,v))%mod;
-        }
-        else if(prev==m){
-            ways+=(maxmarray(i+1,prev-1,n,m,dp,v))%mod;
-            ways+=(maxmarray(i+1,prev,n,m,dp,v))%mod;
-        }
-        else{
-            ways+=(maxmarray(i+1,prev-1,n,m,dp,v))%mod;
-            // if(i==1) cout<<ways<<"--\n";
-            ways+=(maxmarray(i+1,prev+1,n,m,dp,v))%mod;
-            // if(i==1) cout<<ways<<"*--*\n";
-            ways+=(maxmarray(i+1,prev,n,m,dp,v))%mod;
-            // if(i==1) cout<<ways<<"-*-\n";
-        }
-        return dp[i][prev]=ways%mod;
-    }
-
-    
-}
- 
 void solve()
 {
-    int n,m;
-    cin>>n>>m;
-    vector<int> v(n);
-    for(auto &it:v) cin>>it;
-    vector<vector<int>> dp(n+1,vector<int> (m+1,0));
-    if(v[n-1]==0){
-        for(int j=0;j<=m;j++) dp[n-1][j]=1;
-    }
-    else{
-        dp[n-1][v[n-1]]=1;
-    }
-    // for(int i=1;i<=m;i++) dp[n][i]=1;
-    for(int i=n-2;i>=0;i--){
-        if(v[i]==0){
-            for(int j=1;j<=m;j++){
-                
-                // int val=(()||(dp[i+1][j-1]));
-                
-                dp[i][j]+=(dp[i+1][j]);
-                if(j>1) dp[i][j]+=(dp[i+1][j-1]);
-                if(j<m) dp[i][j]+=(dp[i+1][j+1]);
-                dp[i][j] = dp[i][j]%mod;
+    string s;
+    cin>>s;
+    int n=s.size();
+    vector<int> z(n);
+    int l,r;
+    l=0;
+    r=0;
+
+    for(int i=1;i<n;i++){
+        if(i<=r){
+            
+            z[i]=min((r-i+1),(z[i-l]));
+            // if(i==n-1){
+            //     cout<<(r-i+1)<<" "<<r<<" \n";
+            // }
+            while(i+z[i]<n&&s[z[i]]==s[i+z[i]]){
+                z[i]++;
+            }
+            if(i+z[i]>r){
+                l=i;
+                r=i+z[i]-1;
             }
         }
         else{
-            dp[i][v[i]]+=(dp[i+1][v[i]]);
-            if(v[i]>1) dp[i][v[i]]+=(dp[i+1][v[i]-1]);
-            if(v[i]<m) dp[i][v[i]]+=(dp[i+1][v[i]+1]);
-            dp[i][v[i]] = dp[i][v[i]]%mod;
+            int j=i;
+            int k=0;
+            while(j<n&&s[j]==s[k]){
+                j++;
+                k++;
+            }
+            l=i;
+            r=j-1;
+            z[i]=k;
         }
     }
-    // int ans=maxmarray(0,0,n,m,dp,v);
-    int ans=0;
-    for(int i=1;i<=m;i++){
-        ans+=(dp[0][i]);
-        ans=ans%mod;
+    // for(auto it:z) cout<<it<<" ";
+    // cout<<"\n"; 
+    vector<int> suff(n);
+    suff[n-1]=z[n-1];
+    for(int i=n-2;i>=0;i--){
+        suff[i]=suff[i+1];
+        if(z[i]==(n-i)){
+            suff[i]=max(z[i],suff[i]);
+        }
     }
-    cout<<ans<<"\n";
+    // for(auto it:suff){
+    //     cout<<it<<" ";
+    
+    // }
+    // cout<<"\n";
+    int len=0;
+    for(int i=1;i<n-1;i++){
+        if(z[i]>0){
+            if(z[i]>=suff[i+1]){
+                len=max(len,suff[i+1]);
+            }
+            // int l=min(suff[i+1],z[i]);
+            // len=max(len,l);
+        }
+    }
+    
+    
+    // ll j=n-1;
+    // while(j>0&&z[j]==0) j--;
+    // len=z[j];
+    // j--;
+    // int ans=0;
+    // while(j>0){
+    //     if(z[j]>ans){
+    //         ans=len;
+    //         // cnt++;
+    //         break;
+    //     }
+    //     else{
+    //         ans=max(ans,z[j]);
+    //     }
+    //     j--;
+    // }
+    if(len>0){
+        cout<<s.substr(0,len);
+    }
+    else cout<<"Just a legend\n";
+
 }
  
 
@@ -243,52 +248,3 @@ int main()
     return 0;
 }
 
-
-
-#include <iostream>
-#include <vector>
-using namespace std;
-
-typedef long long ll;
-#define pb push_back
-#define pi pair<int, int>
-#define f first
-#define mp make_pair
-#define s second
-
-ll dp[100001][101];
-const ll MOD = (10e8) + 7;
-int main() {
-	ios_base::sync_with_stdio(0);
-	cin.tie(0);
-	int n, m;
-	cin >> n >> m;
-	int arr[n];
-	for (int i = 0; i < n; i++) { cin >> arr[i]; }
-	if (arr[0] == 0) {
-		fill(dp[0], dp[0] + 101, 1);
-	} else {
-		dp[0][arr[0]] = 1;
-	}
-	for (int i = 1; i < n; i++) {
-		if (arr[i] == 0) {
-			for (int j = 1; j <= m; j++) {
-				dp[i][j] += dp[i - 1][j];
-				if (j - 1 > 0) dp[i][j] += dp[i - 1][j - 1];
-				if (j + 1 <= m) dp[i][j] += dp[i - 1][j + 1];
-				dp[i][j] %= MOD;
-			}
-		} else {
-			dp[i][arr[i]] += dp[i - 1][arr[i]];
-			if (arr[i] - 1 > 0) dp[i][arr[i]] += dp[i - 1][arr[i] - 1];
-			if (arr[i] + 1 <= m) dp[i][arr[i]] += dp[i - 1][arr[i] + 1];
-			dp[i][arr[i]] %= MOD;
-		}
-	}
-	ll ans = 0;
-	for (int i = 1; i <= m; i++) {
-		ans += dp[n - 1][i];
-		ans %= MOD;
-	}
-	cout << ans;
-}

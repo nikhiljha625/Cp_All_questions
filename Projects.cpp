@@ -140,85 +140,47 @@ ll mod = 1e9+7;
 //*******************************************************************************************************************************************
 
 
-
-int maxmarray(int i,int prev,int& n,int& m,vector<vector<int>>& dp,vector<int>& v){
-    // cout<<i<<" "<<prev<<"\n";
-    if(i>=n) return 1;
-    if(v[i]>0){
-        if(prev==0) return dp[i][prev]= maxmarray(i+1,v[i],n,m,dp,v)%mod;
-        else{
-            int diff = abs(prev-v[i]);
-            if(diff>1) return 0;
-            else return dp[i][prev]=maxmarray(i+1,v[i],n,m,dp,v)%mod;
-        }
+bool cmp(pair<pair<int,int>,int>& a,pair<pair<int,int>,int>& b){
+    if(a.first.first!=b.first.first){
+        return a.first.first<b.first.first;
+    }
+    else if(a.first.second!=b.first.second){
+        return a.first.second<b.first.second;
     }
     else{
-        int ways=0;
-        if(prev==0){
-            for(int j=1;j<=m;j++){
-                ways+=(maxmarray(i+1,j,n,m,dp,v))%mod;
-            }
-        }
-        else if(prev==1){
-            ways+=(maxmarray(i+1,prev+1,n,m,dp,v))%mod;
-            ways+=(maxmarray(i+1,prev,n,m,dp,v))%mod;
-        }
-        else if(prev==m){
-            ways+=(maxmarray(i+1,prev-1,n,m,dp,v))%mod;
-            ways+=(maxmarray(i+1,prev,n,m,dp,v))%mod;
-        }
-        else{
-            ways+=(maxmarray(i+1,prev-1,n,m,dp,v))%mod;
-            // if(i==1) cout<<ways<<"--\n";
-            ways+=(maxmarray(i+1,prev+1,n,m,dp,v))%mod;
-            // if(i==1) cout<<ways<<"*--*\n";
-            ways+=(maxmarray(i+1,prev,n,m,dp,v))%mod;
-            // if(i==1) cout<<ways<<"-*-\n";
-        }
-        return dp[i][prev]=ways%mod;
+        return a.second>b.second;
     }
-
-    
 }
- 
+
 void solve()
 {
-    int n,m;
-    cin>>n>>m;
-    vector<int> v(n);
-    for(auto &it:v) cin>>it;
-    vector<vector<int>> dp(n+1,vector<int> (m+1,0));
-    if(v[n-1]==0){
-        for(int j=0;j<=m;j++) dp[n-1][j]=1;
+    int n;
+    cin>>n;
+    vector<pair<pair<int,int>,int>> v(n);
+    for(int i=0;i<n;i++){
+        cin>>v[i].first.first>>v[i].first.second>>v[i].second;
     }
-    else{
-        dp[n-1][v[n-1]]=1;
+    sort(all(v),cmp);
+    for(auto it:v){
+        cout<<it.first.first<<" "<<it.first.second<<" "<<it.second<<"\n";
     }
-    // for(int i=1;i<=m;i++) dp[n][i]=1;
-    for(int i=n-2;i>=0;i--){
-        if(v[i]==0){
-            for(int j=1;j<=m;j++){
-                
-                // int val=(()||(dp[i+1][j-1]));
-                
-                dp[i][j]+=(dp[i+1][j]);
-                if(j>1) dp[i][j]+=(dp[i+1][j-1]);
-                if(j<m) dp[i][j]+=(dp[i+1][j+1]);
-                dp[i][j] = dp[i][j]%mod;
-            }
+    map<int,int> mp;
+    mp[v[0].first.second] = v[0].second;
+    for(int i=1;i<n;i++){
+        auto it= mp.lower_bound(v[i].first.first);
+        int val=0;
+        if(it!=mp.begin()){
+            it--;
+
+            val=it->second;
+            mp.erase(it);
         }
-        else{
-            dp[i][v[i]]+=(dp[i+1][v[i]]);
-            if(v[i]>1) dp[i][v[i]]+=(dp[i+1][v[i]-1]);
-            if(v[i]<m) dp[i][v[i]]+=(dp[i+1][v[i]+1]);
-            dp[i][v[i]] = dp[i][v[i]]%mod;
-        }
+        mp[v[i].first.second] = v[i].second+val;
     }
-    // int ans=maxmarray(0,0,n,m,dp,v);
     int ans=0;
-    for(int i=1;i<=m;i++){
-        ans+=(dp[0][i]);
-        ans=ans%mod;
+    for(auto it:mp){
+        // cout<<it.first<<" "<<it.second<<"\n";
+        ans=max(ans,it.second);
     }
     cout<<ans<<"\n";
 }
@@ -243,52 +205,3 @@ int main()
     return 0;
 }
 
-
-
-#include <iostream>
-#include <vector>
-using namespace std;
-
-typedef long long ll;
-#define pb push_back
-#define pi pair<int, int>
-#define f first
-#define mp make_pair
-#define s second
-
-ll dp[100001][101];
-const ll MOD = (10e8) + 7;
-int main() {
-	ios_base::sync_with_stdio(0);
-	cin.tie(0);
-	int n, m;
-	cin >> n >> m;
-	int arr[n];
-	for (int i = 0; i < n; i++) { cin >> arr[i]; }
-	if (arr[0] == 0) {
-		fill(dp[0], dp[0] + 101, 1);
-	} else {
-		dp[0][arr[0]] = 1;
-	}
-	for (int i = 1; i < n; i++) {
-		if (arr[i] == 0) {
-			for (int j = 1; j <= m; j++) {
-				dp[i][j] += dp[i - 1][j];
-				if (j - 1 > 0) dp[i][j] += dp[i - 1][j - 1];
-				if (j + 1 <= m) dp[i][j] += dp[i - 1][j + 1];
-				dp[i][j] %= MOD;
-			}
-		} else {
-			dp[i][arr[i]] += dp[i - 1][arr[i]];
-			if (arr[i] - 1 > 0) dp[i][arr[i]] += dp[i - 1][arr[i] - 1];
-			if (arr[i] + 1 <= m) dp[i][arr[i]] += dp[i - 1][arr[i] + 1];
-			dp[i][arr[i]] %= MOD;
-		}
-	}
-	ll ans = 0;
-	for (int i = 1; i <= m; i++) {
-		ans += dp[n - 1][i];
-		ans %= MOD;
-	}
-	cout << ans;
-}
